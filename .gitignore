@@ -1,0 +1,9 @@
+# Project exclude paths
+/target/
+
+# IDEs
+.idea/
+.vscode/
+
+# Local data
+data/
