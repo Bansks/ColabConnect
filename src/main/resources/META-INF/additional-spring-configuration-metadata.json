@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "spring.mvc.pathmatch.use-suffix-pattern",
+      "type": "java.lang.String",
+      "description": "Description for spring.mvc.pathmatch.use-suffix-pattern."
+  }
+] }
