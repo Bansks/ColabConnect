@@ -68,6 +68,32 @@
     .chat-empty-icon { font-size:56px; margin-bottom:12px; }
     .chat-empty-title { font-size:18px; font-weight:700; color:var(--text-primary); margin-bottom:6px; }
     .chat-empty-sub { font-size:13px; max-width:280px; }
+
+    /* Tasks panel layout */
+    .chat-tasks-panel { width: 320px; min-width: 320px; background: var(--surface); border-left: 1px solid var(--border); display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+    .chat-tasks-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .chat-tasks-title { font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .chat-tasks-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+    .task-category { display: flex; flex-direction: column; }
+    .task-section-title { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    
+    .task-card { background: var(--surface-alt); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 12px; display: flex; flex-direction: column; gap: 8px; transition: box-shadow 0.15s; position: relative; }
+    .task-card:hover { box-shadow: var(--shadow-sm); }
+    .task-card-top { display: flex; align-items: flex-start; gap: 8px; }
+    .task-checkbox { width: 16px; height: 16px; margin-top: 2px; cursor: pointer; }
+    .task-title { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; word-break: break-word; }
+    .task-title.completed { text-decoration: line-through; color: var(--text-muted); }
+    
+    .task-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+    .task-priority { font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 10px; }
+    .task-priority.high { background: #fde7e9; color: var(--danger); }
+    .task-priority.medium { background: #fff3e0; color: var(--warning); }
+    .task-priority.low { background: #e6f4ea; color: var(--success); }
+    
+    .task-due { font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
+    .task-assignee { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+    
+    .task-actions { display: flex; align-items: center; gap: 8px; justify-content: flex-end; margin-top: 4px; padding-top: 8px; border-top: 1px dashed var(--border); }
   </style>
   <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
 </head>
@@ -97,12 +123,85 @@
           <div class="chat-empty-sub">Choose a direct message or project chat from the left panel</div>
         </div>
       </div>
+
+      <!-- Tasks Panel (Collapsible, for project chats only) -->
+      <div class="chat-tasks-panel" id="chat-tasks-panel" style="display:none;">
+        <div class="chat-tasks-header">
+          <div class="chat-tasks-title">
+            <box-icon name="list-check" color="currentColor" style="width: 18px; height: 18px; vertical-align: middle;"></box-icon> Project Tasks
+          </div>
+          <button class="btn-icon" onclick="toggleTasksPanel()"><box-icon name="x" color="currentColor" style="width: 16px; height: 16px; vertical-align: middle;"></box-icon></button>
+        </div>
+        <div class="chat-tasks-body">
+          <button id="add-task-trigger-btn" class="btn btn-primary btn-full btn-sm" onclick="openCreateTaskModal()" style="display:none; margin-bottom:12px;">+ Add Task</button>
+          
+          <div class="task-category" id="category-pending-container">
+            <div class="task-section-title">Pending</div>
+            <div id="tasks-list-pending" style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;"></div>
+          </div>
+
+          <div class="task-category" id="category-inprogress-container">
+            <div class="task-section-title">In Progress</div>
+            <div id="tasks-list-inprogress" style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;"></div>
+          </div>
+
+          <div class="task-category" id="category-done-container">
+            <div class="task-section-title">Completed</div>
+            <div id="tasks-list-done" style="display:flex; flex-direction:column; gap:8px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Task Modal -->
+<div class="modal-overlay" id="create-task-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Create Project Task</div>
+      <button class="btn-icon" onclick="closeModal('create-task-modal')"><box-icon name="x" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px; vertical-align: middle;"></box-icon></button>
+    </div>
+    <div class="modal-body">
+      <div id="create-task-error" style="display:none;" class="error-msg mb-16"></div>
+      <div class="form-group">
+        <label class="form-label">Task Title *</label>
+        <input type="text" id="task-title-input" class="form-input" placeholder="e.g. Implement WebSocket Handshake" max="200" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description (optional)</label>
+        <textarea id="task-desc-input" class="form-textarea" placeholder="Add detailed notes or requirements..." max="2000"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Assignee *</label>
+          <select id="task-assignee-select" class="form-select" required>
+            <option value="">Choose team member...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select id="task-priority-select" class="form-select">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Due Date (optional)</label>
+        <input type="date" id="task-duedate-input" class="form-input">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('create-task-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="createProjectTask()" id="task-create-confirm-btn">Create Task</button>
     </div>
   </div>
 </div>
 
 <script src="/js/app.js?v=6"></script>
-<script src="/js/chat.js"></script>
+<script src="/js/chat.js?v=6"></script>
 <div th:replace="~{layout :: project-modal}"></div>
 </body>
 </html>
