@@ -81,15 +81,18 @@ let currentMode = null;   // 'dm' or 'project'
     if (dms.length === 0) {
       html += `<div style="padding:8px 16px;font-size:12px;color:var(--text-muted)">No conversations yet. <a href="/discover.html">Find people</a></div>`;
     } else {
-      html += dms.map(d => `
+      html += dms.map(d => {
+        const style = getAvatarStyle(d.name);
+        return `
         <div class="chat-item" id="dm-item-${d.userId}" onclick="selectDm('${d.userId}', '${d.userId}')">
-          <div class="chat-item-icon">${getInitials(d.name)}</div>
+          <div class="chat-item-icon" style="background: ${style.bg}; color: ${style.color} !important;">${getInitials(d.name)}</div>
           <div class="chat-item-info">
             <div class="chat-item-name">${d.name}</div>
             <div class="chat-item-preview">${d.lastMessage ? (d.lastMessageIsOwn ? 'You: ' : '') + d.lastMessage.substring(0, 35) + (d.lastMessage.length > 35 ? '…' : '') : d.title || ''}</div>
           </div>
           ${d.connected ? '' : '<div title="Not connected" style="width:8px;height:8px;border-radius:50%;background:#ffc107;flex-shrink:0"></div>'}
-        </div>`).join('');
+        </div>`;
+      }).join('');
     }
 
     html += `<div class="chat-section-label" style="margin-top:8px">Project Chats</div>`;
@@ -98,7 +101,7 @@ let currentMode = null;   // 'dm' or 'project'
     } else {
       html += projects.map(p => `
         <div class="chat-item" id="proj-item-${p.id}" onclick="selectProject('${p.id}')">
-          <div class="chat-item-icon project"><box-icon name="folder" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px;"></box-icon></div>
+          <div class="chat-item-icon project"><box-icon name="briefcase" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px;"></box-icon></div>
           <div class="chat-item-info">
             <div class="chat-item-name">${p.name}</div>
             <div class="chat-item-preview">${p.type} · ${p.memberCount} member${p.memberCount !== 1 ? 's' : ''}</div>
@@ -142,9 +145,10 @@ let currentMode = null;   // 'dm' or 'project'
     const badge = connected
       ? `<span class="badge badge-available" style="font-size:11px">Connected</span>`
       : `<span class="badge" style="background:#fff3cd;color:#856404;font-size:11px"><box-icon name="error" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px;"></box-icon> Not Connected</span>`;
+    const headerStyle = getAvatarStyle(data.partnerName);
     document.getElementById('chat-main').innerHTML = `
       <div class="chat-header">
-        <div class="chat-header-icon">${getInitials(data.partnerName)}</div>
+        <div class="chat-header-icon" style="background: ${headerStyle.bg}; color: ${headerStyle.color} !important;">${getInitials(data.partnerName)}</div>
         <div><div class="chat-header-name">${data.partnerName}</div><div class="chat-header-sub">${data.partnerTitle || ''}</div></div>
         <div class="chat-header-badge">${badge}</div>
       </div>
@@ -190,7 +194,7 @@ let currentMode = null;   // 'dm' or 'project'
 
     document.getElementById('chat-main').innerHTML = `
       <div class="chat-header">
-        <div class="chat-header-icon project"><box-icon name="folder" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px;"></box-icon></div>
+        <div class="chat-header-icon project"><box-icon name="briefcase" animation="tada-hover" color="currentColor" style="width: 18px; height: 18px;"></box-icon></div>
         <div><div class="chat-header-name" style="cursor:pointer" onclick="openProjectDetail('${currentTarget}')">${data.projectName}</div><div class="chat-header-sub">${project.memberCount || 0} members · ${project.type || ''}</div></div>
         <div class="chat-header-badge" style="display:flex; align-items:center; gap:8px;">${badge}${tasksBtn}</div>
       </div>
@@ -228,10 +232,25 @@ let currentMode = null;   // 'dm' or 'project'
         const isOwn = msg.isOwn !== undefined ? msg.isOwn : msg.fromUserId === myId || msg.senderId === myId;
         const name = msg.senderName || (isOwn ? 'You' : 'Unknown');
         const time = d.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+        
+        const showAvatar = mode !== 'dm';
+        const showSenderName = mode !== 'dm';
+        
+        const avatarStyle = isOwn 
+          ? { bg: 'linear-gradient(135deg, #2563eb, #1d4ed8)', color: '#ffffff' } // Own user blue gradient
+          : getAvatarStyle(name);
+          
+        const avatarHtml = showAvatar 
+          ? `<div class="msg-avatar" style="background: ${avatarStyle.bg}; color: ${avatarStyle.color} !important;">${getInitials(name)}</div>` 
+          : '';
+        const senderHtml = showSenderName 
+          ? `<span class="msg-sender">${name}</span>` 
+          : '';
+          
         html += `<div class="msg-group ${isOwn ? 'own' : ''}">
-          <div class="msg-avatar">${getInitials(name)}</div>
+          ${avatarHtml}
           <div class="msg-body">
-            <div class="msg-meta"><span class="msg-sender">${name}</span><span class="msg-time">${time}</span></div>
+            <div class="msg-meta">${senderHtml}<span class="msg-time">${time}</span></div>
             <div class="msg-bubble">${escapeHtml(msg.content)}</div>
           </div></div>`;
       });
@@ -352,6 +371,27 @@ let currentMode = null;   // 'dm' or 'project'
   function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
   function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
   function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  function getAvatarStyle(name) {
+    const themes = [
+      { bg: 'linear-gradient(135deg, #4f46e5, #818cf8)', color: '#ffffff' }, // Indigo (Dark)
+      { bg: 'linear-gradient(135deg, #0ea5e9, #38bdf8)', color: '#0f172a' }, // Sky (Light)
+      { bg: 'linear-gradient(135deg, #10b981, #34d399)', color: '#ffffff' }, // Emerald (Dark)
+      { bg: 'linear-gradient(135deg, #f59e0b, #fbbf24)', color: '#0f172a' }, // Amber (Light)
+      { bg: 'linear-gradient(135deg, #ef4444, #f87171)', color: '#ffffff' }, // Red (Dark)
+      { bg: 'linear-gradient(135deg, #d946ef, #e879f9)', color: '#ffffff' }, // Fuchsia (Dark)
+      { bg: 'linear-gradient(135deg, #8b5cf6, #a78bfa)', color: '#ffffff' }, // Violet (Dark)
+      { bg: 'linear-gradient(135deg, #f43f5e, #fb7185)', color: '#ffffff' }, // Rose (Dark)
+      { bg: 'linear-gradient(135deg, #14b8a6, #2dd4bf)', color: '#0f172a' }, // Teal (Light)
+      { bg: 'linear-gradient(135deg, #06b6d4, #22d3ee)', color: '#0f172a' }  // Cyan (Light)
+    ];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % themes.length;
+    return themes[index];
+  }
 
   window.addEventListener('beforeunload', () => { if (stompClient) stompClient.disconnect(); });
 

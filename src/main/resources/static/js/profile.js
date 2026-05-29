@@ -30,103 +30,148 @@ let viewedUserId = null;
 
     renderProfile(data);
   }
-
   function renderProfile(u) {
     const avClass = u.availability === 'available' ? 'available' : u.availability === 'weekends' ? 'weekends' : 'limited';
     const avLabel = availabilityLabel(u.availability);
-    const workStyleLabels = { 'async-friendly': '<box-icon name="globe" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px; vertical-align: middle;"></box-icon> Async-Friendly', 'collaborative': '<box-icon name="network-chart" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px;"></box-icon> Collaborative', 'structured': '<box-icon name="clipboard" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px;"></box-icon> Structured', 'flexible': '<box-icon name="bolt" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px;"></box-icon> Flexible' };
+    const workStyleLabels = { 'async-friendly': '<box-icon name="globe" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px; vertical-align: middle;"></box-icon> Async-Friendly', 'collaborative': '<box-icon name="network-chart" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px; vertical-align: middle;"></box-icon> Collaborative', 'structured': '<box-icon name="clipboard" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px; vertical-align: middle;"></box-icon> Structured', 'flexible': '<box-icon name="bolt" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px; vertical-align: middle;"></box-icon> Flexible' };
 
     document.getElementById('profile-content').innerHTML = `
-      <div style="max-width:800px">
-        <!-- Hero -->
-        <div class="profile-hero">
-          <div class="profile-info">
-            <div class="user-avatar user-avatar-xl">${getInitials(u.name)}</div>
-            <div class="profile-meta">
-              <div class="profile-name">${u.name}</div>
-              <div class="profile-title-text">${u.title || 'Developer'}</div>
-              <div style="display:flex;align-items:center;gap:12px;margin-top:10px;font-size:13px;opacity:0.9">
-                <span><span class="availability-dot ${avClass}"></span>${avLabel}</span>
-                ${u.workStyle ? `<span>${workStyleLabels[u.workStyle] || u.workStyle}</span>` : ''}
+      <div style="width:100%">
+        <!-- Hero Banner -->
+        <div class="profile-hero" style="margin-bottom: 24px;">
+          <div class="profile-info" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px; width:100%">
+            <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+              <div class="user-avatar user-avatar-xl" style="background: linear-gradient(135deg, var(--brand-blue), var(--brand-blue-dark)); color: white; box-shadow: var(--shadow-sm);">${getInitials(u.name)}</div>
+              <div class="profile-meta">
+                <div class="profile-name" style="font-size: 24px; font-weight: 700; color: white;">${u.name}</div>
+                <div class="profile-title-text" style="font-size: 15px; opacity: 0.9; color: white; margin-top: 4px;">${u.title || 'Developer'}</div>
+                <div style="display:flex;align-items:center;gap:12px;margin-top:10px;font-size:13px;">
+                  <span style="background:rgba(255,255,255,0.15); padding:4px 10px; border-radius:12px; color:white; display:inline-flex; align-items:center; gap:6px;">
+                    <span class="availability-dot ${avClass}" style="margin:0"></span>${avLabel}
+                  </span>
+                  ${u.workStyle ? `<span style="background:rgba(255,255,255,0.15); padding:4px 10px; border-radius:12px; color:white; display:inline-flex; align-items:center; gap:6px;">${workStyleLabels[u.workStyle] || u.workStyle}</span>` : ''}
+                </div>
               </div>
             </div>
-            <div class="profile-stats-row">
-              ${u.reliabilityScore > 0 ? `<div class="profile-stat"><div class="profile-stat-value">${u.reliabilityScore}%</div><div class="profile-stat-label">Reliability</div></div>` : ''}
-              <div class="profile-stat"><div class="profile-stat-value">${u.collaborations || 0}</div><div class="profile-stat-label">Collabs</div></div>
+            <div class="profile-stats-row" style="display:flex; gap:16px; margin:0; flex-wrap:wrap;">
+              ${u.reliabilityScore > 0 ? `<div class="profile-stat" style="background:rgba(255,255,255,0.15); padding:12px 18px; border-radius:var(--radius-lg); min-width:90px; text-align:center;"><div class="profile-stat-value" style="font-size:20px; font-weight:700; color:white;">${u.reliabilityScore}%</div><div class="profile-stat-label" style="font-size:11px; opacity:0.8; color:white; margin-top:2px;">Reliability</div></div>` : ''}
+              <div class="profile-stat" style="background:rgba(255,255,255,0.15); padding:12px 18px; border-radius:var(--radius-lg); min-width:90px; text-align:center;"><div class="profile-stat-value" style="font-size:20px; font-weight:700; color:white;">${u.collaborations || 0}</div><div class="profile-stat-label" style="font-size:11px; opacity:0.8; color:white; margin-top:2px;">Collaborations</div></div>
+              ${u.avgRating > 0 ? `<div class="profile-stat" style="background:rgba(255,255,255,0.15); padding:12px 18px; border-radius:var(--radius-lg); min-width:90px; text-align:center;"><div class="profile-stat-value" style="font-size:20px; font-weight:700; color:white;">${u.avgRating.toFixed(1)} ★</div><div class="profile-stat-label" style="font-size:11px; opacity:0.8; color:white; margin-top:2px;">Rating</div></div>` : ''}
             </div>
           </div>
         </div>
 
-        <!-- Body -->
-        <div class="profile-body">
-          ${u.bio ? `
-            <div class="mb-16">
-              <div class="card-title mb-16">About</div>
-              <p style="line-height:1.7;color:var(--text-secondary)">${u.bio}</p>
-            </div>
-            <div class="divider"></div>` : ''}
-
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px" class="mb-16">
-            <div>
-              <div class="card-title mb-16">Skills</div>
-              ${u.skills?.length ? `<div class="tags">${u.skills.map(s => `<span class="tag">${s}</span>`).join('')}</div>`
-                : `<div class="text-muted text-sm">No skills listed</div>`}
-            </div>
-            <div>
-              <div class="card-title mb-16">Looking for Projects</div>
-              ${u.projectTypes?.length ? `<div class="tags">${u.projectTypes.map(t => `<span class="tag tag-muted">${t}</span>`).join('')}</div>`
-                : `<div class="text-muted text-sm">Not specified</div>`}
-            </div>
-          </div>
-
-          ${u.reliabilityScore > 0 ? `
-            <div class="divider"></div>
-            <div class="mb-16">
-              <div class="card-title mb-16">Reliability Score</div>
-              <div style="display:flex;align-items:center;gap:12px">
-                <div class="score-bar" style="flex:1"><div class="score-fill" style="width:${u.reliabilityScore}%"></div></div>
-                <span class="fw-600 text-purple">${u.reliabilityScore}%</span>
+        <!-- 2-Column Responsive Dashboard -->
+        <div class="profile-dashboard-grid">
+          <!-- Left Column (Primary Info) -->
+          <div style="display:flex; flex-direction:column; gap:24px;">
+            <!-- About Card -->
+            <div class="card" style="display:flex; flex-direction:column; gap:16px;">
+              <div class="card-title" style="font-size:15px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:8px;">
+                <box-icon name="user" color="var(--brand-blue)" style="width:20px; height:20px; vertical-align:middle;"></box-icon> About Me
               </div>
-              <div class="text-sm text-muted mt-8">Based on ${u.collaborations || 0} completed collaboration${u.collaborations !== 1 ? 's' : ''}</div>
-            </div>` : ''}
+              <p style="line-height:1.7; color:var(--text-secondary); font-size:14px; white-space:pre-line;">${u.bio || 'This collaborator has not completed their bio yet.'}</p>
+            </div>
 
-          ${(u.githubUrl || u.portfolioUrl) ? `
-            <div class="divider"></div>
-            <div>
-              <div class="card-title mb-16">Links</div>
-              <div style="display:flex;gap:12px;flex-wrap:wrap">
-                ${u.githubUrl ? `<a href="${u.githubUrl}" target="_blank" class="btn btn-secondary btn-sm"><box-icon name="github" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px; vertical-align: middle;" type="logo"></box-icon> GitHub</a>` : ''}
-                ${u.portfolioUrl ? `<a href="${u.portfolioUrl}" target="_blank" class="btn btn-secondary btn-sm"><box-icon name="globe" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px; vertical-align: middle;"></box-icon> Portfolio</a>` : ''}
+            <!-- Peer Ratings & Reviews Card -->
+            ${u.ratingCount > 0 ? `
+            <div class="card" style="display:flex; flex-direction:column; gap:16px;">
+              <div class="card-title" style="font-size:15px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:8px;">
+                <box-icon name="star" type="solid" color="var(--brand-blue)" style="width:20px; height:20px; vertical-align:middle;"></box-icon> Peer Ratings & Reviews
               </div>
-            </div>` : ''}
-
-          ${u.ratingCount > 0 ? `
-            <div class="divider"></div>
-            <div class="mb-16">
-              <div class="card-title mb-16"><box-icon name="star" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px;"></box-icon> Peer Ratings</div>
-              <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-                <div style="font-size:32px;font-weight:800;color:var(--teams-purple)">${u.avgRating.toFixed(1)}</div>
+              
+              <div style="display:flex; align-items:center; gap:24px; background:var(--surface-alt); padding:16px 20px; border-radius:var(--radius-lg); flex-wrap:wrap; border:1px solid var(--border);">
+                <div style="font-size:36px; font-weight:800; color:var(--brand-blue); display:flex; align-items:center; gap:4px;">${u.avgRating.toFixed(1)} <span style="font-size:20px; color:var(--text-muted); font-weight:500;">/ 5.0</span></div>
+                <div style="height:40px; width:1px; background:var(--border); display:inline-block;" class="hide-mobile"></div>
                 <div>
-                  <div style="font-size:18px;letter-spacing:2px">${'<box-icon name="star" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px;"></box-icon>'.repeat(Math.round(u.avgRating))}${'<box-icon name="star" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px; vertical-align: middle;"></box-icon>'.repeat(5-Math.round(u.avgRating))}</div>
-                  <div class="text-sm text-muted">${u.ratingCount} rating${u.ratingCount !== 1 ? 's' : ''} from completed projects</div>
+                  <div style="display:flex; align-items:center; gap:2px; margin-bottom:4px;">
+                    ${'<box-icon name="star" type="solid" color="#f59e0b" style="width:18px; height:18px;"></box-icon>'.repeat(Math.round(u.avgRating))}
+                    ${'<box-icon name="star" color="var(--text-muted)" style="width:18px; height:18px;"></box-icon>'.repeat(5-Math.round(u.avgRating))}
+                  </div>
+                  <div class="text-sm text-muted">Based on ${u.ratingCount} project rating${u.ratingCount !== 1 ? 's' : ''}</div>
                 </div>
               </div>
+              
               ${(u.endorsements||[]).length ? `
-                <div class="card-title mb-8" style="font-size:12px">Recent Endorsements</div>
-                ${u.endorsements.map(e => `
-                  <div style="background:var(--bg-secondary);border-radius:10px;padding:12px 14px;margin-bottom:10px">
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-                      <span style="font-weight:700;font-size:13px">${e.fromName}</span>
-                      <span style="font-size:12px;letter-spacing:1px">${'<box-icon name="star" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px;"></box-icon>'.repeat(e.stars)}</span>
-                    </div>
-                    <div style="font-size:12px;color:var(--text-secondary);font-style:italic">"${e.note}"</div>
-                    <div style="font-size:11px;color:var(--text-muted);margin-top:4px">via ${e.projectName}</div>
-                  </div>`).join('')}` : ''}
+                <div style="font-size:13px; font-weight:700; color:var(--text); margin-top:8px; margin-bottom:4px;">Recent Collaborations Feed</div>
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                  ${u.endorsements.map(e => `
+                    <div style="background:var(--surface-alt); border:1px solid var(--border); border-radius:var(--radius-lg); padding:16px; display:flex; flex-direction:column; gap:8px; box-shadow:var(--shadow-sm);">
+                      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                          <div class="user-avatar" style="width:28px; height:28px; font-size:11px; display:flex; align-items:center; justify-content:center;">${getInitials(e.fromName)}</div>
+                          <span style="font-weight:600; font-size:13px; color:var(--text);">${e.fromName}</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:2px;">
+                          ${'<box-icon name="star" type="solid" color="#f59e0b" style="width:14px; height:14px;"></box-icon>'.repeat(e.stars)}
+                        </div>
+                      </div>
+                      <div style="font-size:13px; color:var(--text-secondary); font-style:italic; line-height:1.5;">"${escapeHtml(e.note)}"</div>
+                      <div style="font-size:11px; color:var(--text-muted); display:flex; align-items:center; gap:4px; margin-top:2px;">
+                        <box-icon name="folder" color="currentColor" style="width:12px; height:12px; vertical-align:middle;"></box-icon> via ${e.projectName}
+                      </div>
+                    </div>`).join('')}
+                </div>` : ''}
+            </div>` : ''}
+          </div>
+
+          <!-- Right Column (Sidebar Info) -->
+          <div style="display:flex; flex-direction:column; gap:24px;">
+            <!-- Skills Inventory Card -->
+            <div class="card" style="display:flex; flex-direction:column; gap:16px;">
+              <div class="card-title" style="font-size:13px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:8px;">
+                <box-icon name="code-alt" color="var(--brand-blue)" style="width:18px; height:18px; vertical-align:middle;"></box-icon> Skills Inventory
+              </div>
+              ${u.skills?.length 
+                ? `<div class="tags" style="display:flex; flex-wrap:wrap; gap:6px;">${u.skills.map(s => `<span class="tag" style="padding:4px 10px; font-size:12px;">${s}</span>`).join('')}</div>`
+                : `<div class="text-muted text-sm" style="font-style:italic;">No skills listed.</div>`
+              }
+            </div>
+
+            <!-- Project Interests Card -->
+            <div class="card" style="display:flex; flex-direction:column; gap:16px;">
+              <div class="card-title" style="font-size:13px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:8px;">
+                <box-icon name="briefcase" color="var(--brand-blue)" style="width:18px; height:18px; vertical-align:middle;"></box-icon> Project Interests
+              </div>
+              ${u.projectTypes?.length 
+                ? `<div class="tags" style="display:flex; flex-wrap:wrap; gap:6px;">${u.projectTypes.map(t => `<span class="tag tag-muted" style="padding:4px 10px; font-size:12px;">${t}</span>`).join('')}</div>`
+                : `<div class="text-muted text-sm" style="font-style:italic;">Not specified.</div>`
+              }
+            </div>
+
+            <!-- Performance Meter (Only if reliability > 0) -->
+            ${u.reliabilityScore > 0 ? `
+            <div class="card" style="display:flex; flex-direction:column; gap:12px;">
+              <div class="card-title" style="font-size:13px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:8px;">
+                <box-icon name="analyse" color="var(--brand-blue)" style="width:18px; height:18px; vertical-align:middle;"></box-icon> Reliability Metric
+              </div>
+              <div style="display:flex; align-items:center; gap:12px; margin-top:4px;">
+                <div class="score-bar" style="flex:1; height:8px; background:var(--border); border-radius:4px; overflow:hidden;">
+                  <div class="score-fill" style="width:${u.reliabilityScore}%; height:100%; background:var(--brand-blue); border-radius:4px;"></div>
+                </div>
+                <span class="fw-600 text-purple" style="font-size:14px; font-weight:700; color:var(--brand-blue);">${u.reliabilityScore}%</span>
+              </div>
+              <div class="text-sm text-muted" style="line-height:1.4;">Shows consistency in deliverability and teamwork on shared projects.</div>
             </div>` : ''}
 
-          ${u.email ? `
-            <div class="divider"></div>
-            <div class="text-sm text-muted"><box-icon name="envelope" animation="tada-hover" color="currentColor" style="width: 16px; height: 16px; vertical-align: middle;"></box-icon> ${u.email} · Joined ${formatDate(u.joinedAt)}</div>` : ''}
+            <!-- Verified Links & Social Profiles -->
+            ${(u.githubUrl || u.portfolioUrl || u.email) ? `
+            <div class="card" style="display:flex; flex-direction:column; gap:16px;">
+              <div class="card-title" style="font-size:13px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:8px;">
+                <box-icon name="link-alt" color="var(--brand-blue)" style="width:18px; height:18px; vertical-align:middle;"></box-icon> Connections & Links
+              </div>
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                ${u.githubUrl ? `<a href="${u.githubUrl}" target="_blank" class="btn btn-secondary btn-full btn-sm" style="justify-content:flex-start; text-align:left; font-size:12px; padding:8px 12px;"><box-icon name="github" type="logo" color="currentColor" style="width: 16px; height: 16px; margin-right:8px; vertical-align:middle;"></box-icon> GitHub Profile</a>` : ''}
+                ${u.portfolioUrl ? `<a href="${u.portfolioUrl}" target="_blank" class="btn btn-secondary btn-full btn-sm" style="justify-content:flex-start; text-align:left; font-size:12px; padding:8px 12px;"><box-icon name="globe" color="currentColor" style="width: 16px; height: 16px; margin-right:8px; vertical-align:middle;"></box-icon> Personal Portfolio</a>` : ''}
+              </div>
+              
+              ${u.email ? `
+                <div style="padding-top:12px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:8px; font-size:12px; color:var(--text-secondary);">
+                  <div style="display:flex; align-items:center; gap:6px;"><box-icon name="envelope" color="currentColor" style="width: 14px; height: 14px;"></box-icon> ${u.email}</div>
+                  <div style="display:flex; align-items:center; gap:6px;"><box-icon name="calendar-event" color="currentColor" style="width: 14px; height: 14px;"></box-icon> Joined ${formatDate(u.joinedAt)}</div>
+                </div>` : ''}
+            </div>` : ''}
+          </div>
         </div>
       </div>`;
   }

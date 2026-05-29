@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${title} + ' — ColabConnect'">ColabConnect</title>
+    <script>
+      (function() {
+        const theme = localStorage.getItem('cc_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/styles.css?v=6">
+    <link rel="stylesheet" href="/css/styles.css?v=7">
   <script src="/webjars/sockjs-client/sockjs.min.js"></script>
   <script src="/webjars/stomp-websocket/stomp.min.js"></script>
   <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
@@ -38,6 +44,9 @@
             <div class="panel-title">ColabConnect</div>
             <div class="text-sm text-secondary">Find your next collaborator</div>
         </div>
+        <button id="theme-toggle-btn" class="btn-icon" onclick="toggleTheme()" title="Toggle Theme">
+            <box-icon name="moon" animation="tada-hover" color="currentColor" style="width: 18px; height: 18px;"></box-icon>
+        </button>
     </div>
     <div class="panel-body">
         <div class="section-header">Navigation</div>

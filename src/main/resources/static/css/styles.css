@@ -28,6 +28,41 @@
   --shadow-lg: 0 4px 16px rgba(0,0,0,0.16);
   --radius: 4px;
   --radius-lg: 8px;
+
+  /* Chat Template Local Mappings */
+  --sidebar-bg: var(--surface);
+  --bg-primary: var(--bg);
+  --bg-secondary: var(--surface);
+  --text-primary: var(--text);
+  --hover-bg: var(--surface-alt);
+  --teams-purple: #6264a7;
+}
+
+:root[data-theme="dark"] {
+  --brand-blue: #3b82f6;
+  --brand-blue-dark: #2563eb;
+  --brand-blue-light: rgba(59, 130, 246, 0.2);
+  --teams-sidebar-bg: #090d16;
+  --teams-sidebar-hover: rgba(255,255,255,0.08);
+  --teams-sidebar-active: rgba(255,255,255,0.15);
+  --bg: #0b0f19;
+  --surface: #151d30;
+  --surface-alt: #1e293b;
+  --border: #334155;
+  --text: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.3);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.4);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.5);
+  
+  /* Chat Template Local Mappings in Dark Mode */
+  --sidebar-bg: var(--surface);
+  --bg-primary: var(--bg);
+  --bg-secondary: var(--surface);
+  --text-primary: var(--text);
+  --hover-bg: var(--surface-alt);
+  --teams-purple: #8385c7;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,6 +74,10 @@ html, body {
   color: var(--text);
   background: var(--bg);
   overflow: hidden;
+}
+
+body, .left-panel, .panel-header, .page-header, .main-content, .card, .user-card, .project-card, .request-card, .modal, .chat-sidebar, .chat-main, .chat-header, .chat-footer, .chat-tasks-panel, .form-input, .form-select, .form-textarea, .btn {
+  transition: background 0.25s ease, background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 /* ===================== AUTH PAGES ===================== */
@@ -507,4 +546,5 @@ a:hover { text-decoration: underline; }
   .card-grid-3 { grid-template-columns: 1fr; }
   .auth-brand { display: none; }
   .auth-form-container { width: 100%; }
+  .profile-dashboard-grid { grid-template-columns: 1fr !important; }
 }

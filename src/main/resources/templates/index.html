@@ -4,7 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ColabConnect — Find Your Perfect Collaborator</title>
-  <link rel="stylesheet" href="/css/styles.css?v=6">
+  <script>
+    (function() {
+      const theme = localStorage.getItem('cc_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+  <link rel="stylesheet" href="/css/styles.css?v=7">
 </head>
 <body>
 <div class="auth-page">
@@ -48,7 +54,10 @@
     </div>
   </div>
 
-  <div class="auth-form-container">
+  <div class="auth-form-container" style="position: relative;">
+    <button id="theme-toggle-btn" class="btn-icon" onclick="toggleTheme()" title="Toggle Theme" style="position: absolute; top: 16px; right: 16px;">
+        <box-icon name="moon" animation="tada-hover" color="currentColor" style="width: 18px; height: 18px;"></box-icon>
+    </button>
     <div class="auth-form">
       <h2>Welcome to ColabConnect</h2>
       <p class="subtitle">Connect with talented collaborators for your next project</p>
@@ -105,7 +114,7 @@
 </div>
 
 <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
-<script src="/js/app.js?v=6"></script>
+<script src="/js/app.js?v=7"></script>
 <script th:inline="none">
   redirectIfLoggedIn();
 

@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import com.colabconnect.model.User;
 
 @Controller
 public class WebViewController {
@@ -53,8 +55,15 @@ public class WebViewController {
     }
 
     @GetMapping({"/profile", "/profile.html"})
-    public String profile(Model model, HttpServletRequest request) {
-        model.addAttribute("activePage", "profile");
+    public String profile(@RequestParam(value = "id", required = false) String id, Model model, HttpServletRequest request) {
+        User currentUser = (User) request.getAttribute("currentUser");
+        boolean isOwnProfile = (id == null || currentUser == null || id.equals(currentUser.getId()));
+        
+        if (isOwnProfile) {
+            model.addAttribute("activePage", "profile");
+        } else {
+            model.addAttribute("activePage", "discover");
+        }
         return checkAuth(request, "profile");
     }
     

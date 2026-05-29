@@ -398,3 +398,30 @@ async function addMemberToProject() {
       info.style.display = 'block';
     }
   };
+
+  /* ===================== GLOBAL THEME TOGGLE FACILITY ===================== */
+  window.toggleTheme = function() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('cc_theme', newTheme);
+    updateThemeUI(newTheme);
+  };
+
+  window.updateThemeUI = function(theme) {
+    const toggleBtns = document.querySelectorAll('#theme-toggle-btn');
+    toggleBtns.forEach(btn => {
+      if (theme === 'dark') {
+        btn.setAttribute('title', 'Switch to Light Mode');
+        btn.innerHTML = '<box-icon name="sun" animation="tada-hover" color="currentColor" style="width: 18px; height: 18px;"></box-icon>';
+      } else {
+        btn.setAttribute('title', 'Switch to Dark Mode');
+        btn.innerHTML = '<box-icon name="moon" animation="tada-hover" color="currentColor" style="width: 18px; height: 18px;"></box-icon>';
+      }
+    });
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('cc_theme') || 'light';
+    updateThemeUI(savedTheme);
+  });

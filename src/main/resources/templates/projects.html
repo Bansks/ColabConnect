@@ -4,7 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Projects — ColabConnect</title>
-  <link rel="stylesheet" href="/css/styles.css?v=6">
+  <script>
+    (function() {
+      const theme = localStorage.getItem('cc_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+  <link rel="stylesheet" href="/css/styles.css?v=7">
   <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
 </head>
 <body>
@@ -130,7 +136,7 @@
   </div>
 </div>
 
-<script src="/js/app.js?v=6"></script>
+<script src="/js/app.js?v=7"></script>
 <script src="/js/projects.js"></script>
 
 <!-- Rate Teammates Modal -->
